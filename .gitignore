@@ -12,7 +12,7 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
-!ob.db
+OpenBulletAPI/ob.db
 
 # Build results
 [Dd]ebug/
