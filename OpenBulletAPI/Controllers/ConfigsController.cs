@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace OpenBulletAPI.Controllers
@@ -55,69 +56,20 @@ namespace OpenBulletAPI.Controllers
             return File(_configService.Get(groups).ToArray(), "application/zip", "Configs.zip");
         }
 
-        /*
-        // GET api/configs
-        // Admin-only
-        [HttpGet]
-        public ActionResult<List<Config>> Get()
-        {
-            return _configService.Get();
-        }
-
-        // GET api/configs/123
-        [HttpGet("{id}", Name = "GetConfig")]
-        public ActionResult<Config> Get(string id)
-        {
-            var config = _configService.Get(id);
-
-            if (config == null)
-            {
-                return NotFound();
-            }
-
-            return config;
-        }
-
-        // POST api/configs
         [HttpPost]
-        public ActionResult<Config> Create(Config config)
+        public async Task<IActionResult> UploadFile(IFormFile file)
         {
-            _configService.Create(config);
+            if (file == null || file.Length == 0)
+                return Content("No file selected");
 
-            return CreatedAtRoute("GetConfig", new { id = config.Id }, config);
-        }
-
-        // PUT api/configs/123
-        [HttpPut("{id}")]
-        public IActionResult Update(string id, Config configIn)
-        {
-            var config = _configService.Get(id);
-
-            if (config == null)
+            if (await _configService.Upload(file.OpenReadStream(), Request.Headers["Group"].FirstOrDefault(), Request.Headers["Name"].FirstOrDefault()))
             {
-                return NotFound();
+                return Content("Uploaded!");
             }
-
-            _configService.Update(id, configIn);
-
-            return NoContent();
-        }
-
-        // DELETE api/configs/123
-        [HttpDelete("{id}")]
-        public IActionResult Delete(string id)
-        {
-            var config = _configService.Get(id);
-
-            if (config == null)
+            else
             {
-                return NotFound();
+                return Content("Failed to upload");
             }
-
-            _configService.Remove(config.Id);
-
-            return NoContent();
         }
-        */
     }
 }

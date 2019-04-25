@@ -46,32 +46,22 @@ namespace OpenBulletAPI.Services
             }
         }
 
-        /*
-        public Config Get(string id)
+        public async Task<bool> Upload(Stream file, string group, string name)
         {
-            return _configs.Find(config => config.Id == id).FirstOrDefault();
-        }
+            if (group != "" && name.EndsWith(".loli"))
+            {
+                var dir = Path.Combine(_configFolder, group);
+                Directory.CreateDirectory(dir);
+                var comb = Path.Combine(dir, Path.GetFileName(name));
 
-        public Config Create(Config config)
-        {
-            _configs.Insert(config);
-            return config;
-        }
+                using (var stream = new FileStream(comb, System.IO.FileMode.Create))
+                {
+                    await file.CopyToAsync(stream);
+                    return true;
+                }
+            }
 
-        public void Update(string id, Config config)
-        {
-            _configs.Update(config);
+            return false;
         }
-
-        public void Remove(Config config)
-        {
-            _configs.Delete(c => c.Id == config.Id);
-        }
-
-        public void Remove(string id)
-        {
-            _configs.Delete(config => config.Id == id);
-        }
-        */
     }
 }
