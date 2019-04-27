@@ -13,5 +13,8 @@ namespace OpenBulletAPI.Models
 
         [BsonField("Groups")]
         public string[] Groups { get; set; }
+
+        [BsonField("IPs")]
+        public string[] IPs { get; set; }
     }
 }

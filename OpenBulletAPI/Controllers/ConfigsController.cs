@@ -31,14 +31,27 @@ namespace OpenBulletAPI.Controllers
             if (Auth.StartsWith("Basic"))
             {
                 // Login to external API and get the groups
-                return new string[] { };
+                throw new Exception("UserPass Authentication not implemented on this API");
             }
             else // Otherwise we assume it's an API key
             {
+                // Retrieve the user
                 var user = _userService.GetUser(Auth);
 
-                if (user == null) return new string[] { };
-                else return user.Groups;
+                // Check if the user exists
+                if (user == null)
+                {
+                    throw new Exception("The user does not exist");
+                }
+
+                // Check the IP if the IPs whitelist is not blank
+                var ip = Request.HttpContext.Connection.RemoteIpAddress.ToString();
+                if (user.IPs.Length != 0 && !user.IPs.Contains(ip))
+                {
+                    throw new Exception("Unauthorized IP");
+                }
+
+                return user.Groups;
             }
         }
 
@@ -51,9 +64,16 @@ namespace OpenBulletAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var groups = GetGroups();
+            try
+            {
+                var groups = GetGroups();
 
-            return File(_configService.Get(groups).ToArray(), "application/zip", "Configs.zip");
+                return File(_configService.Get(groups).ToArray(), "application/zip", "Configs.zip");
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.Message);
+            }
         }
 
         [HttpPost]
