@@ -46,9 +46,12 @@ namespace OpenBulletAPI.Controllers
 
                 // Check the IP if the IPs whitelist is not blank
                 var ip = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-                if (user.IPs.Length != 0 && !user.IPs.Contains(ip))
+                if (user.IPs != null)
                 {
-                    throw new Exception("Unauthorized IP");
+                    if (user.IPs.Length != 0 && !user.IPs.Contains(ip))
+                    {
+                        throw new Exception("Unauthorized IP");
+                    }
                 }
 
                 return user.Groups;
