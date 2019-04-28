@@ -48,7 +48,7 @@ namespace OpenBulletAPI.Controllers
                 var ip = Request.HttpContext.Connection.RemoteIpAddress.ToString();
                 if (user.IPs != null)
                 {
-                    if (user.IPs.Length != 0 && !user.IPs.Contains(ip))
+                    if (user.IPs.Where(i => !string.IsNullOrEmpty(i.Trim())).Count() > 0 && !user.IPs.Contains(ip))
                     {
                         throw new Exception("Unauthorized IP");
                     }
