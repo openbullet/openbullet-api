@@ -60,6 +60,7 @@ namespace OpenBulletAPI.Controllers
                 if (_appSettings.AutoBindFirstIP && user.IPs == null)
                 {
                     user.IPs = new string[] { ip };
+                    _userService.UpdateUser(user);
                 }
 
                 return user.Groups;

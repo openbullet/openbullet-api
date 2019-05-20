@@ -18,6 +18,11 @@ namespace OpenBulletAPI.Services
             return _users.Find(user => user.Key == key).FirstOrDefault();
         }
 
+        public void UpdateUser(User user)
+        {
+            _users.Update(user);
+        }
+
         public UserService(IConfiguration configuration)
         {
             using (var db = new LiteDatabase(configuration.GetConnectionString("db")))
