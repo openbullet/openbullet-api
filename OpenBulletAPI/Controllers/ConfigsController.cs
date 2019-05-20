@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using OpenBulletAPI.Models;
 using OpenBulletAPI.Services;
 using System;
@@ -17,6 +18,7 @@ namespace OpenBulletAPI.Controllers
     {
         private readonly ConfigService _configService;
         private readonly UserService _userService;
+        private readonly AppSettings _appSettings;
         private string Auth
         {
             get
@@ -54,14 +56,21 @@ namespace OpenBulletAPI.Controllers
                     }
                 }
 
+                // If we set AutoBindFirstIP to true, add the current IP to the array
+                if (_appSettings.AutoBindFirstIP && user.IPs == null)
+                {
+                    user.IPs = new string[] { ip };
+                }
+
                 return user.Groups;
             }
         }
 
-        public ConfigsController(ConfigService configService, UserService userService)
+        public ConfigsController(IOptions<AppSettings> settings, ConfigService configService, UserService userService)
         {
             _configService = configService;
             _userService = userService;
+            _appSettings = settings.Value;
         }
 
         [HttpGet]
