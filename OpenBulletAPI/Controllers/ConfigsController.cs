@@ -48,16 +48,16 @@ namespace OpenBulletAPI.Controllers
 
                 // Check the IP if the IPs whitelist is not blank
                 var ip = Request.HttpContext.Connection.RemoteIpAddress.ToString();
-                if (user.IPs != null)
+                if (user.IPs != null && user.IPs.Count(i => !string.IsNullOrWhiteSpace(i)) > 0)
                 {
-                    if (user.IPs.Where(i => i != null && i.Trim() != "").Count() > 0 && !user.IPs.Contains(ip))
+                    if (!user.IPs.Contains(ip))
                     {
                         throw new Exception("Unauthorized IP");
                     }
                 }
 
                 // If we set AutoBindFirstIP to true, add the current IP to the array
-                if (_appSettings.AutoBindFirstIP && user.IPs == null)
+                if (_appSettings.AutoBindFirstIP && (user.IPs == null || user.IPs.Count(i => !string.IsNullOrWhiteSpace(i)) == 0))
                 {
                     user.IPs = new string[] { ip };
                     _userService.UpdateUser(user);
