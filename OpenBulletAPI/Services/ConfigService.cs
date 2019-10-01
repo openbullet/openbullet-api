@@ -30,15 +30,8 @@ namespace OpenBulletAPI.Services
                     foreach (var group in groups.Where(g => g.Trim() != ""))
                     {
                         var dir = Path.Combine(_configFolder, group);
-                        if (Directory.Exists(dir))
-                        {
-                            foreach(var file in Directory.EnumerateFiles(dir).Where(file => file.EndsWith(".loli")))
-                            {
-                                var zipArchiveEntry = archive.CreateEntry(Path.GetFileName(file), CompressionLevel.Fastest);
-                                var fileContent = File.ReadAllBytes(file);
-                                using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(fileContent, 0, fileContent.Length);
-                            }
-                        }
+                        
+                        ZipFolderRecursively(archive, dir, _configFolder);
                     }
                 }
 
@@ -46,6 +39,24 @@ namespace OpenBulletAPI.Services
             }
         }
 
+        private void ZipFolderRecursively(ZipArchive archive, string currentDir, string baseDir)
+        {
+            // Add all the files
+            foreach (var file in Directory.EnumerateFiles(currentDir).Where(file => file.EndsWith(".loli")))
+            {
+                // Create the file entry and write the file content
+                var zipArchiveEntry = archive.CreateEntry($"{file.Substring(baseDir.Length + 1)}", CompressionLevel.Fastest);
+                var fileContent = File.ReadAllBytes(file);
+                using (var zipStream = zipArchiveEntry.Open()) zipStream.Write(fileContent, 0, fileContent.Length);
+            }
+
+            // Add subfolders recursively
+            foreach (var dir in Directory.EnumerateDirectories(currentDir))
+            {
+                ZipFolderRecursively(archive, dir, baseDir);
+            }
+        }
+        
         public async Task<bool> Upload(Stream file, string group, string name)
         {
             if (group != "" && name.EndsWith(".loli"))
